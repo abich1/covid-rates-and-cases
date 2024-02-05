@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Covid Rates in the United States in 2020</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* the layout of the legend panel */
+        #legend {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 110px;
+            background: #fff;
+            margin-right: 20px;
+            margin-bottom: 40px;
+            padding: 10px 20px 10px 10px;
+            border-radius: 3px;
+            text-align: center;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        /* each line for a break */
+        .break {
+            position: relative;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        /* basic style for a dot/circle */
+        .dot {
+            display: inline-block;
+            margin-top: 5px;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        /* the label for the dot */
+        .dot-label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-style: italic;
+        }
+
+        /* the text color of a hyper link */
+        a {
+            color: black
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="legend"></div>
+    <h1>COVID Deaths/Cases in the United States in 2020</h1>
+    <script>
+        // initialize basemmap
+        mapboxgl.accessToken =
+            'pk.eyJ1IjoiamFrb2J6aGFvIiwiYSI6ImNpcms2YWsyMzAwMmtmbG5icTFxZ3ZkdncifQ.P9MBej1xacybKcDN_jehvw';
+        const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            style: 'mapbox://styles/mapbox/light-v10', // style URL
+            zoom: 3, // starting zoom
+            center: [-100, 40] // starting center
+        });
+
+        // load data and add as layer
+        async function geojsonFetch() {
+            let response = await fetch('assets/us-covid-2020-rates.json');
+            let county_data = await response.json();
+
+            map.on('load', function loadingData() {
+                map.addSource('county_data', {
+                    type: 'geojson',
+                    data: county_data
+                });
+
+                map.addLayer({
+                    'id': 'county_data_layer',
+                    'type': 'fill',
+                    'source': 'county_data',
+                    'paint': {
+                        'fill-color': [
+                            'step',
+                            ['get', 'density'],
+                            '#FFEDA0',   // stop_output_0
+                            10,          // stop_input_0
+                            '#FED976',   // stop_output_1
+                            20,          // stop_input_1
+                            '#FEB24C',   // stop_output_2
+                            50,          // stop_input_2
+                            '#FD8D3C',   // stop_output_3
+                            100,         // stop_input_3
+                            '#FC4E2A',   // stop_output_4
+                            200,         // stop_input_4
+                            '#E31A1C',   // stop_output_5
+                            500,         // stop_input_5
+                            '#BD0026',   // stop_output_6
+                            1000,        // stop_input_6
+                            "#800026"    // stop_output_7
+                        ],
+                        'fill-outline-color': '#BBBBBB',
+                        'fill-opacity': 0.7,
+                    }
+                });
+
+                const layers = [
+                    '0-9',
+                    '10-19',
+                    '20-49',
+                    '50-99',
+                    '100-199',
+                    '200-499',
+                    '500-999',
+                    '1000 and more'
+                ];
+                const colors = [
+                    '#FFEDA070',
+                    '#FED97670',
+                    '#FEB24C70',
+                    '#FD8D3C70',
+                    '#FC4E2A70',
+                    '#E31A1C70',
+                    '#BD002670',
+                    '#80002670'
+                ];
+
+                // create legend
+                const legend = document.getElementById('legend');
+                legend.innerHTML = "<b>COVID Cases/Death Rate</b><br>";
+
+
+                layers.forEach((layer, i) => {
+                    const color = colors[i];
+                    const item = document.createElement('div');
+                    const key = document.createElement('span');
+                    key.className = 'legend-key';
+                    key.style.backgroundColor = color;
+
+                    const value = document.createElement('span');
+                    value.innerHTML = `${layer}`;
+                    item.appendChild(key);
+                    item.appendChild(value);
+                    legend.appendChild(item);
+                });
+            });
+
+            map.on('mousemove', ({point}) => {
+                const state = map.queryRenderedFeatures(point, {
+                    layers: ['county_data_layer']
+                });
+                document.getElementById('text-description').innerHTML = state.length ?
+                    `<h3>${state[0].properties.name}</h3><p><strong><em>${state[0].properties.density}</strong> people per square mile</em></p>` :
+                    `<p>Hover over a state!</p>`;
+            });
+        }
+
+        // Call the function to fetch GeoJSON data and load the map
+        geojsonFetch();
+    </script>
+
+
+</body>
+
+</html>
