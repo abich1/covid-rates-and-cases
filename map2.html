@@ -91,16 +91,18 @@
         map.on('load', () => { //simplifying the function statement: arrow with brackets to define a function
             // when loading a geojson, there are two steps
             // add a source of the data and then add the layer out of the source
+
+            map.setProjection({
+            name: 'albers',
+            center: [-95, 41.1],
+            parallels: [20, 60]
+            });
+            
             map.addSource('us-covid-2020-counts', {
                 type: 'json',
                 data: 'assets/us-covid-2020-counts.json'
             });
-            map.setProjection('albers');
-            map.setProjection({
-            name: 'albers',
-            center: [35, 55],
-            parallels: [20, 60]
-            });
+
             map.addLayer({
                 'id': 'us-covid-2020-counts-point',
                 'type': 'circle',
