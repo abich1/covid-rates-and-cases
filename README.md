@@ -20,9 +20,9 @@ Here, we see a screenshot of Map 2 zoomed into Washington and King County, WA cl
 
 # Primary Functions
 
-* For Map 1, we are intializing a choropleth map showing the rates of COVID-19 in counties per 1000 residents in the United States. When interacting with the map by hovering over a county, the county name and rates of COVID-19 per 1000 residents for that county appear in the upper lefthand corner.
+* For Map 1, we are intializing a choropleth map showing the rates of COVID-19 in counties per 1000 residents in the United States using 2018 population data to calculate the case rates. When interacting with the map by hovering over a county, the county name and rates of COVID-19 per 1000 residents for that county appear in the upper lefthand corner.
 
-* For Map 2, we are intializing a proportional symbols map showing the number of cases in counties in the United States. Counties are shown with a different colored dot depending on the number of cases by thousands. When clicking on a proportional symbol, the county name and more precise case count will be shown in a pop-up.
+* For Map 2, we are intializing a proportional symbols map showing the number of cases in counties in the United States. Counties are shown with a different colored and sized dot depending on the number of cases by thousands. When clicking on a proportional symbol, the county name and more precise case count will be shown in a pop-up.
 
 The general code flow: 
 
