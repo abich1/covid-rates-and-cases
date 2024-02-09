@@ -7,7 +7,7 @@
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script> 
     <style>
         body {
             margin: 0;
@@ -26,7 +26,7 @@
             position: absolute;
             bottom: 0;
             right: 0;
-            width: 110px;
+            width: 130px;
             background: #fff;
             margin-right: 20px;
             margin-bottom: 40px;
@@ -59,6 +59,18 @@
             font-style: italic;
         }
 
+        .map-overlay {
+            position: absolute;
+            left: 0;
+            background: rgba(255, 255, 255, 0.8);
+            border-style: solid;
+            border-width: 1px;
+            border-color: rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+            overflow: auto;
+            border-radius: 5px;
+        }
+
         /* the text color of a hyper link */
         a {
             color: black
@@ -68,6 +80,9 @@
 
 <body>
     <div id="map"></div>
+    <div class='map-overlay' id='features'>
+        <h1>Covid Counts in the United States in 2020</h1>
+    </div>
     <div id="legend"></div>
     <div id="title">
         Covid Counts in the United States in 2020
@@ -79,18 +94,15 @@
         let map = new mapboxgl.Map({
             container: 'map', // container ID
             style: 'mapbox://styles/mapbox/dark-v10',
-            zoom: 4.5, // starting zoom
-            minZoom: 4, // minimum zoom level of the map
-            center: [-95, 41.1] // starting center
+            zoom: 1, // starting zoom
+            minZoom: 3.75, // minimum zoom level of the map
+            center: [-97.5, 38.5] // starting center
         });
-        const grades = [4, 5, 6],
-            colors = ['rgb(208,209,230)', 'rgb(103,169,207)', 'rgb(1,108,89)'],
-            radii = [5, 15, 20];
-        //load data to the map as new layers.
-        //map.on('load', function loadingData() {
-        map.on('load', () => { //simplifying the function statement: arrow with brackets to define a function
-            // when loading a geojson, there are two steps
-            // add a source of the data and then add the layer out of the source
+        const grades = [1000,2000,3000,4000,5000,6000],
+            colors = ['rgb(208,209,230)', 'rgb(103,169,207)', 'rgb(1,108,89)', 'rgb(200,60,50)', 'rgb(100,1,89)', 'rgb(1,10,200)'],
+            radii = [5, 10, 15, 20, 25, 30];
+
+        map.on('load', () => { 
 
             map.setProjection({
             name: 'albers',
@@ -99,7 +111,7 @@
             });
             
             map.addSource('us-covid-2020-counts', {
-                type: 'json',
+                type: 'geojson',
                 data: 'assets/us-covid-2020-counts.json'
             });
 
@@ -107,24 +119,30 @@
                 'id': 'us-covid-2020-counts-point',
                 'type': 'circle',
                 'source': 'us-covid-2020-counts',
-                'minzoom': 5,
+                'zoom': 15,
                 'paint': {
                     // increase the radii of the circle as cases value increases
                     'circle-radius': {
-                        'property': 'coordinates',
+                        'property': 'cases',
                         'stops': [
                             [grades[0], radii[0]],
                             [grades[1], radii[1]],
-                            [grades[2], radii[2]]
+                            [grades[2], radii[2]],
+                            [grades[3], radii[3]],
+                            [grades[4], radii[4]],
+                            [grades[5], radii[5]],
                         ]
                     },
                     // change the color of the circle as cases value increases
                     'circle-color': {
-                        'property': 'coordinates',
+                        'property': 'cases',
                         'stops': [
                             [grades[0], colors[0]],
                             [grades[1], colors[1]],
-                            [grades[2], colors[2]]
+                            [grades[2], colors[2]],
+                            [grades[3], colors[3]],
+                            [grades[4], colors[4]],
+                            [grades[5], colors[5]]
                         ]
                     },
                     'circle-stroke-color': 'white',
@@ -136,20 +154,19 @@
             map.on('click', 'us-covid-2020-counts-point', (event) => {
                 new mapboxgl.Popup()
                     .setLngLat(event.features[0].geometry.coordinates)
-                    .setHTML(`<strong>Magnitude:</strong> ${event.features[0].properties.mag}`)
+                    .setHTML(`<strong>Case Count in ${event.features[0].properties.county} County:</strong> ${event.features[0].properties.cases}`)
                     .addTo(map);
             });
         });
         // create legend
         const legend = document.getElementById('legend');
         //set up legend grades and labels
-        var labels = ['<strong>Magnitude</strong>'],
+        var labels = ['<strong>Case Count</strong>'],
             vbreak;
         //iterate through grades and create a scaled circle and label for each
         for (var i = 0; i < grades.length; i++) {
             vbreak = grades[i];
-            // you need to manually adjust the radius of each dot on the legend 
-            // in order to make sure the legend can be properly referred to the dot on the map.
+
             dot_radii = 2 * radii[i];
             labels.push(
                 '<p class="break"><i class="dot" style="background:' + colors[i] + '; width: ' + dot_radii +
@@ -162,8 +179,6 @@
             '<p style="text-align: right; font-size:10pt">Source: <a href="https://github.com/nytimes/covid-19-data/blob/43d32dde2f87bd4dafbb7d23f5d9e878124018b8/live/us-counties.csv">The New York Times</a></p>';
         // combine all the html codes.
         legend.innerHTML = labels.join('') + source;
-
-
     </script>
 
 </body>
