@@ -15,10 +15,16 @@ Here, we see a screenshot of Map 1 when hovering over King County, WA.
 Here, we see a screenshot of Map 2 at the landing page or when a county is not clicked.
 ![Proportional symbols map of the United States showing COVID-19 counts](img/map2.png)
 
-Here, we see a screenshot of Map 2 when King County, WA is clicked.
+Here, we see a screenshot of Map 2 zoomed into Washington and King County, WA clicked.
 ![Proportional symbols map of the United States showing COVID-19 counts, clicking on King County, WA](img/map2click.png)
 
 # Primary Functions
+
+* For Map 1, we are intializing a choropleth map showing the rates of COVID-19 in counties in the United States. When interacting with the map by hovering over a county, the county name and rates of COVID-19 for that county appear in the upper lefthand corner.
+
+* For Map 2, we are intializing a proportional symbols map showing the number of cases in counties in the United States. Counties are shown with a different colored dot depending on the number of cases by thousands. When clicking on a proportional symbol, the county name and case count will be shown in a pop-up.
+
+The general code flow: 
 
 * Initialize the map
 * Load the data and the layers
@@ -27,7 +33,7 @@ Here, we see a screenshot of Map 2 when King County, WA is clicked.
 
 # Libraries
 
-* Mapbox GL JS: renders interactive maps
+* Mapbox GL JS: renders (interactive) maps
 * Google Fonts: imports Open Sans font
 
 # Data Sources, Credits, and Acknowledgemts
